@@ -1,0 +1,460 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Recommendation System</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="static/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom fonts for this template -->
+    <link href="static/vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href="static/vendor/simple-line-icons/css/simple-line-icons.css" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700,300italic,400italic,700italic" rel="stylesheet" type="text/css">
+
+    <!-- Custom styles for this template -->
+    <link href="static/css/landing-page.min.css" rel="stylesheet">
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.0/jquery.min.js"></script>
+  </head>
+
+  <script type="text/javascript">
+
+    // no cache
+    $(document).ready(function() {
+      $.ajaxSetup({ cache: false });
+    });
+
+    // root url
+    $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+
+    // empty demo
+    function empty_demo() {
+      for(i = 1; i < 11; i++){
+        var url = "https://github.com"
+        var name = "No more demos"
+        $("#demo_"+i.toString()).html(name)
+        $("#demo_"+i.toString()).attr("href",url)  
+        console.log($("#demo_"+i.toString()).attr("href"))
+      }   
+    }
+
+    // update demo
+    function update_demo(data) {
+      for(i = 1; i < 11; i++){
+        //var a = document.getElementById("demo_"+i.toString())
+        //document.getElementById("demo_"+i.toString()).href = data.url[i-1]
+        //document.getElementById("demo_"+i.toString()).innerText = data.name[i-1]
+        var url = data.url[i-1]
+        var name = data.name[i-1]
+        $("#demo_"+i.toString()).html(name)
+        $("#demo_"+i.toString()).attr("href",url)  
+      }         
+    }
+
+    // update button
+    function update_button() {
+      var lan = $('#language').val()
+      console.log(lan)
+      if(lan == "python"){
+        $("#tutorial").attr("href","https://docs.python.org/3/tutorial/") 
+        $("#community").attr("href","https://www.python.org/community/") 
+      }
+      else if(lan == "c++"){
+        $("#tutorial").attr("href","http://www.cplusplus.com/doc/tutorial/") 
+        $("#community").attr("href","http://www.cplusplus.com/forum/") 
+      }
+      else if(lan == "java"){
+        $("#tutorial").attr("href","https://docs.oracle.com/javase/tutorial/") 
+        $("#community").attr("href","http://www.oracle.com/technetwork/java/community/index.html") 
+      }
+      else if(lan == "c"){
+        $("#tutorial").attr("href","https://www.cprogramming.com/tutorial/c-tutorial.html") 
+        $("#community").attr("href","http://www.dreamincode.net/forums/forum/15-c-and-c/") 
+      }
+      else if(lan == "go"){
+        $("#tutorial").attr("href","https://golang.org/doc/") 
+        $("#community").attr("href","https://forum.golangbridge.org/") 
+      }
+      else if(lan == "swift"){
+        $("#tutorial").attr("href","https://swift.org/documentation/#the-swift-programming-language") 
+        $("#community").attr("href","https://swift.org/community/#forums") 
+      }
+      else if(lan == "ruby"){
+        $("#tutorial").attr("href","https://www.ruby-lang.org/en/documentation/") 
+        $("#community").attr("href","https://www.ruby-lang.org/en/community/") 
+      }
+      else if(lan == "javascript"){
+        $("#tutorial").attr("href","https://www.w3schools.com/js/default.asp") 
+        $("#community").attr("href","https://www.codingforums.com/javascript-programming/") 
+      }
+      else if(lan == "c#"){
+        $("#tutorial").attr("href","https://docs.microsoft.com/en-us/dotnet/csharp/") 
+        $("#community").attr("href","http://www.csharpforums.net/") 
+      }
+    }
+
+    // click function for search button   
+    $(document).ready(function() {
+      $('#search_btn').bind('click', function(d) {
+        $.getJSON($SCRIPT_ROOT + '/query', {
+          field: $('#field').val(),
+          extra: $('#extra').val(),
+          language: $('#language').val()
+        }, function(data) {
+          empty_demo()
+          update_demo(data)
+
+          update_tag()
+
+          update_button()
+          $('#valid').show()
+          $('#valid1').show()
+          $('#valid2').show()
+          $('#valid3').show()
+        });
+      d.preventDefault()  
+      return false
+      });
+    });
+
+    // hide all section
+    $(function() {
+      $('#valid').hide();
+      $('#valid1').hide();
+      $('#valid2').hide();
+      $('#valid3').hide();
+      $('#invalid').hide();
+    });
+
+    // print course information
+    function course_info(num) {
+      var course = $('#field').val()
+      $("#tags_text").empty()
+      if(course == "machinelearning"){
+        $("#tags_text").append("<p>" + machine_info[num] + "<\/p>")
+      }
+
+    }
+
+    // data science
+    dataanaly = ["EECS6895","EECS6690","EECS6893","COMS4721","COMS4995-004","COMS6998-010","COMS4121"]
+
+    // machine learning
+    machine = ["COMS4721","COMS4995-003","COMS4771","EECS6720","ELEN4903"]
+    machine_info = ["course ", "course 2", "Machine Learning: This course introduces topics in machine learning for both generative and discriminative estimation. Material will include least squares methods, Gaussian distributions, linear classification, linear regression, maximum likelihood, exponential family distributions, Bayesian networks, Bayesian inference, mixture models, the EM algorithm, graphical models, hidden Markov models, support vector machines, and kernel methods. Students are expected to implement several algorithms in Matlab and have some background in linear algebra and statistics."]
+
+    // deep learning 
+    deeplearn = ["ECBM6040","ECBM6070","EECS6894","COMS6998-003","COMS4995-002"]
+
+    // update course tags
+    function update_tag() {
+      $('#tags').empty()
+      var course = $('#field').val()
+      var flag_tag = 0
+      if(course == "machinelearning"){
+        for(i = 0; i < machine.length; i++){
+          flag_tag ++    
+          $("#tags").append("<button onclick = \"course_info(" + i + ")\" type=\"button\" class=\"btn btn-primary\" style=\"margin-right:5px \">" + machine[i] + "</button>");
+          if (flag_tag%5 ==0){
+            $("#tags").append("<p><hr\/><\/p>")
+            }
+        }
+      } 
+      else if(course == "datascience"){
+        for(i = 0; i < dataanaly.length; i++){
+          flag_tag ++
+          $("#tags").append("<button onclick = \"course_info(" + i + ")\" type=\"button\" class=\"btn btn-primary\" style=\"margin-right:5px \">" + dataanaly[i] + "</button>");
+          if (flag_tag%5 ==0){
+            $("#tags").append("<p><hr\/><\/p>")
+            }
+        }
+      }
+      else if(course == "deeplearning"){
+        for(i = 0; i < deeplearn.length; i++){
+          flag_tag ++
+          $("#tags").append("<button onclick = \"course_info(" + i + ")\" type=\"button\" class=\"btn btn-primary\" style=\"margin-right:5px \">" + deeplearn[i] + "</button>");
+          if (flag_tag%5 ==0){
+            $("#tags").append("<p><hr\/><\/p>")
+            }
+        }
+
+        
+      }
+    }
+
+    // submit feedback
+    function post_feedback() {
+      // var feedback_content = $("#feedback").val()
+      // document.getElementById("feedback").value
+
+      $.getJSON($SCRIPT_ROOT + '/save', {
+          text: $("#feedback").val()
+        }, function(data) {
+          console.log(data)
+        });
+      
+      text_none = ""
+      document.getElementById("feedback").value = text_none
+
+    }
+
+
+
+    </script>
+
+  <style>
+      @import url(http://fonts.googleapis.com/css?family=Source+Code+Pro:400,600);
+      a:link { color: #000000; text-decoration: none;}
+      a:visited { color: #245DEE; }
+      a:hover { color: #A4CD39; text-decoration: underline;}
+      a:active { color: #EE3124; }
+  </style>
+
+  <body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-light bg-light static-top">
+      <div class="container">
+          <h2>Recommendation System</h2>
+      </div>
+    </nav>
+
+    <!-- Masthead -->
+    <header class="masthead text-white text-center">
+      <div class="overlay">
+      </div>
+      <div class="container">
+        <div class="row">
+          <div class="col-md-14 col-lg-8 col-xl-7 mx-auto">
+            <form role="form">
+              <div class="form-row">
+                <div class="col-12 col-md-4 mb-2 mb-md-0">
+                  <select class="form-control form-control-lg" id = "field" placeholder="Research Field">
+                    <option   selected = "selected">Select your field</option>
+                    <option   value="machinelearning" >Machine Learning</option>>
+                    <option   value="datascience" >Data Analytics</option>>   
+                    <option   value="deeplearning" >Deep Learning</option>>     
+                  </select>
+                </div>
+                <div class="col-12 col-md-2 mb-2 mb-md-0">
+                  <input class="form-control form-control-lg" id="extra" placeholder="Enter Extra Information...">
+                </div>
+                <div class="col-12 col-md-4 mb-2 mb-md-0">
+                  <select class="form-control form-control-lg" id = "language" placeholder="Research Field">
+                    <option   selected = "selected">Select your language</option>
+                    <option   value="java" >Java</option>> 
+                    <option   value="python" >Python</option>> 
+                    <option   value="javascript" >JavaScript</option>> 
+                    <option   value="c++" >C++</option>>
+                    <option   value="c#" >C#</option>> 
+                    <option   value="c" >C</option>> 
+                    <option   value="swift" >Swift</option>> 
+                    <option   value="go" >Go</option>> 
+                    <option   value="ruby" >Ruby</option>>                    
+                  </select>
+                </div>
+                <div class="col-12 col-md-2">
+                  <button id="search_btn" type="submit" class="btn btn-block btn-lg btn-primary">Search</button>
+                </div>
+
+
+              </div>
+            </form>
+          </div>
+        </div>
+
+      </div>
+    </header>
+
+    <!-- Testimonials -->
+    <section class="testimonials text-center bg-light">
+
+      <div class="container" id="valid">
+        <h3 class="mb-5">Related Class</h3>
+        <div class="row">
+          <div class="col-md-4">
+            <div class="testimonial-item mx-auto mb-5 mb-lg-0">
+              <img src="static/img/columbia.jpg" class="img-circle">
+              <h5 id="name"></h5>
+              <p id="personaname" class="font-weight-light mb-0"></p>
+            </div>
+          </div> 
+
+          <div class="col-md-8"  id="tags">
+          
+          </div>
+          <div class="col-md-4"  >
+          </div>
+          <div class="col-md-8"  id="tags_text">
+          </div>
+        </div>
+        <p><hr/></p>
+        <h3 id="TAGMAP"></h3>
+        <div class="row" id="graph_frame">
+          <div class="col-md-12" id="vis">         
+              <script>
+              var tcBlack = "#130C0E";
+              </script>  
+          </div>
+        </div>
+      </div>
+
+      <div class="container" id="valid1">
+        <h3 class="mb-5">Demo</h3>
+        <div class="row">
+          <div class="col-md-4">
+            <div class="testimonial-item mx-auto mb-5 mb-lg-0">
+              <img src="static/img/github.jpg" class="img-circle">
+            </div>
+          </div>     
+          <div class="col-md-8">
+          <p class="text-left"> <a href="http://www.runoob.com/" id = "demo_1" target="_blank">demo_1</a>
+          <p class="text-left"> <a href="http://www.runoob.com/" id = "demo_2" target="_blank">demo_2</a>
+          <p class="text-left"> <a href="http://www.runoob.com/" id = "demo_3" target="_blank">demo_3</a>
+          <p class="text-left"> <a href="http://www.runoob.com/" id = "demo_4" target="_blank">demo_4</a>
+          <p class="text-left"> <a href="http://www.runoob.com/" id = "demo_5" target="_blank">demo_5</a>
+          <p class="text-left"> <a href="http://www.runoob.com/" id = "demo_6" target="_blank">demo_6</a>
+          <p class="text-left"> <a href="http://www.runoob.com/" id = "demo_7" target="_blank">demo_7</a>
+          <p class="text-left"> <a href="http://www.runoob.com/" id = "demo_8" target="_blank">demo_8</a>
+          <p class="text-left"> <a href="http://www.runoob.com/" id = "demo_9" target="_blank">demo_9</a>
+          <p class="text-left"> <a href="http://www.runoob.com/" id = "demo_10" target="_blank">demo_10</a>
+          </div>
+          <div class="col-md-12"  id="tags_text">
+          </div>
+        </div>
+        <p><hr/></p>
+        <h3 id="TAGMAP"></h3>
+        <div class="row" id="graph_frame">
+          <div class="col-md-12" id="vis">         
+              <script>
+              var tcBlack = "#130C0E";
+              </script>  
+          </div>
+        </div>
+      </div>
+
+      <div class="container" id="valid2">
+        <h3 class="mb-5">Community, Library and Tutorial</h3>
+        <div class="row">
+          <div class="col-md-4">
+            <div class="testimonial-item mx-auto mb-5 mb-lg-0">
+              <img src="static/img/language.jpg" class="img-circle">
+              <h5 id="name"></h5>
+              <p id="personaname" class="font-weight-light mb-0"></p>
+            </div>
+          </div>     
+          <div class="col-md-2">
+          <a href="http://www.manongjc.com" id = "tutorial" target="_blank">
+          <button type="button" class="btn btn-primary">Tutorial</button>
+          </a>
+          </div>
+
+          <div class="col-md-2">
+          <a href="http://www.manongjc.com" id = "community" target="_blank">
+          <button type="button" class="btn btn-primary">Community</button>
+          </a>
+          </div>
+          <div class="col-md-12"  >
+          </div>
+        </div>
+        <p><hr/></p>
+        <h3 id="TAGMAP"></h3>
+        <div class="row" id="graph_frame">
+          <div class="col-md-12" id="vis">         
+              <script>
+              var tcBlack = "#130C0E";
+              </script>  
+          </div>
+        </div>
+      </div>
+
+      <div class="container" id="valid3">
+        <h3 class="mb-5">Feedback</h3>
+        <div class="row">
+          <div class="col-md-12">
+          <div id="content">
+              <div id="post">
+                  <div >
+                  <textarea id="feedback" type="text" style="width:1000px; height:100px;"></textarea>
+                  </div>
+                  <button id="post_btn" style="border:none; background-color:#3478F6; color:white;border-radius:5px; width:80px; height:30px;" onclick="post_feedback()">Submit</button>
+             </div>
+             <div id="comment"></div>
+          </div>
+          </div>
+        </div>
+        <p><hr/></p>
+      </div>
+
+
+
+      <div class="container" id="init">
+
+      </div>
+
+      <div class="container" id="invalid">
+
+      </div>  
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer bg-light">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-6 h-100 text-center text-lg-left my-auto">
+            <ul class="list-inline mb-2">
+              <li class="list-inline-item">
+                <a href="#">About</a>
+              </li>
+              <li class="list-inline-item">&sdot;</li>
+              <li class="list-inline-item">
+                <a href="#">Contact</a>
+              </li>
+              <li class="list-inline-item">&sdot;</li>
+              <li class="list-inline-item">
+                <a href="#">Terms of Use</a>
+              </li>
+              <li class="list-inline-item">&sdot;</li>
+              <li class="list-inline-item">
+                <a href="#">Privacy Policy</a>
+              </li>
+            </ul>
+            <p class="text-muted small mb-4 mb-lg-0">&copy; Start Bootstrap 2017. All Rights Reserved.</p>
+          </div>
+          <div class="col-lg-6 h-100 text-center text-lg-right my-auto">
+            <ul class="list-inline mb-0">
+              <li class="list-inline-item mr-3">
+                <a href="#">
+                  <i class="fa fa-facebook fa-2x fa-fw"></i>
+                </a>
+              </li>
+              <li class="list-inline-item mr-3">
+                <a href="#">
+                  <i class="fa fa-twitter fa-2x fa-fw"></i>
+                </a>
+              </li>
+              <li class="list-inline-item">
+                <a href="#">
+                  <i class="fa fa-instagram fa-2x fa-fw"></i>
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Bootstrap core JavaScript -->
+    <script src="static/vendor/jquery/jquery.min.js"></script>
+    <script src="static/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+  </body>
+
+</html>
