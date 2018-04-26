@@ -62,7 +62,7 @@ def query():
         language = "+language:"+language
 
     data = json.dumps(query_project(field+extra, language))
-    print data
+    # print data
     return data
 
 @app.route('/save')
