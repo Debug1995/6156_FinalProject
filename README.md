@@ -1,7 +1,7 @@
 # 6156_FinalProject
 The final project of Software Engineering(CMOS_6156) by Two Engineers
 ## Directory structure
-1. root directory contains the test program file, the project proposal and the questionaire we distributed
+1. Root directory contains the test program file, the project proposal, the questionaire we distributed, course description, and our final project.
 
 2. Web directory contains the web application
 
